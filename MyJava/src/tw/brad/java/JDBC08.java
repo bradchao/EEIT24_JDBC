@@ -53,8 +53,8 @@ public class JDBC08 {
 			prop.put("password", "root");
 			Connection conn = DriverManager.getConnection(urlGife, prop);
 			
-			String sql = "INSERT INTO gift (name,org,spec,url)" +
-					" VALUES (?,?,?,?)";
+			String sql = "INSERT INTO gift (name,org,spec,url,addr)" +
+					" VALUES (?,?,?,?,?)";
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			
 			JSONArray root = new JSONArray(json);
@@ -64,11 +64,13 @@ public class JDBC08 {
 				String org = row.getString("ProduceOrg");
 				String spec = row.getString("SpecAndPrice");
 				String url = row.getString("Column1");
+				String addr = row.getString("SalePlace");
 				
 				pstmt.setString(1, name);
 				pstmt.setString(2, org);
 				pstmt.setString(3, spec);
 				pstmt.setString(4, url);
+				pstmt.setString(5, addr);
 				pstmt.executeUpdate();
 			}
 			System.out.println("finish");
