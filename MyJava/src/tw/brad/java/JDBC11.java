@@ -10,7 +10,7 @@ import java.util.Properties;
 public class JDBC11 {
 	static Member member;
 	public static void main(String[] args) {
-		String account = "amy", passwd = "123456";
+		String account = "amy", passwd = "12346";
 		
 		String url = "jdbc:mysql://localhost:3306/iii";
 		Properties prop = new Properties();
@@ -18,8 +18,9 @@ public class JDBC11 {
 		prop.put("password", "root");
 		
 		try(Connection conn = DriverManager.getConnection(url, prop)) {
-			if (login(account, passwd, conn)) {
-				System.out.println(String.format("Welcome, %s", member.getRealname()));
+			if ((member = login(account, passwd, conn)) != null) {
+				System.out.println(
+						String.format("Welcome, %s", member.getRealname()));
 			}else {
 				System.out.println("get out");;
 			}
@@ -28,8 +29,22 @@ public class JDBC11 {
 		}
 	}
 	
-	static boolean login(String account, String passwd, Connection conn) {
-		return true;
+	static Member login(String account, String passwd, Connection conn) 
+		throws Exception {
+		member = null;
+		String sql = "SELECT * FROM member WHERE account = ? AND password = ?";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, account);
+		pstmt.setString(2, passwd);
+		ResultSet rs = pstmt.executeQuery();
+		if (rs.next()) {
+			member = new Member(
+					rs.getInt("id"), 
+					rs.getString("account"), 
+					rs.getString("realname"));
+		}
+		
+		return member;
 	}
 	
 }

@@ -11,8 +11,6 @@ public class Member {
 		this.realname = realname;
 	}
 	
-	
-	
 	public int getId() {
 		return id;
 	}
