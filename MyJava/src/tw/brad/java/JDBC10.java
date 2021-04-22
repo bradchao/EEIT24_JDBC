@@ -8,9 +8,12 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class JDBC10 {
+	static final String sqlCheckRepeat = "SELECT count(*) as count FROM member WHERE account = ?";
+	static final String sqlAppend = "INSERT INTO member (account, password, realname) VALUES (?,?,?)";
+	static PreparedStatement pstmtCheckRepeat, pstmtAppend;
 
 	public static void main(String[] args) {
-		String account = "eric", passwd = "123456", realname = "Brad Chao";
+		String account = "amy", passwd = "123456", realname = "Brad Chao";
 		
 		String url = "jdbc:mysql://localhost:3306/iii";
 		Properties prop = new Properties();
@@ -18,6 +21,9 @@ public class JDBC10 {
 		prop.put("password", "root");
 		
 		try(Connection conn = DriverManager.getConnection(url, prop)) {
+			pstmtCheckRepeat = conn.prepareStatement(sqlCheckRepeat);
+			pstmtAppend = conn.prepareStatement(sqlAppend);
+			
 			if (!isDataRepeat(account, conn)) {
 				if (appendData(account, passwd, realname, conn)) {
 					System.out.println("append ok");
@@ -34,10 +40,8 @@ public class JDBC10 {
 	
 	static boolean isDataRepeat(String account, Connection conn)
 		throws SQLException {
-		String sql = "SELECT count(*) as count FROM member WHERE account = ?";
-		PreparedStatement pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, account);
-		ResultSet rs = pstmt.executeQuery();
+		pstmtCheckRepeat.setString(1, account);
+		ResultSet rs = pstmtCheckRepeat.executeQuery();
 		rs.next();
 		return rs.getInt("count") != 0;
 	}
@@ -45,12 +49,10 @@ public class JDBC10 {
 	static boolean appendData(
 			String account, String passwd, String realname, Connection conn)
 			throws SQLException {
-		String sql = "INSERT INTO member (account, password, realname) VALUES (?,?,?)";
-		PreparedStatement pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, account);
-		pstmt.setString(2, passwd);
-		pstmt.setString(3, realname);
-		int rowCount = pstmt.executeUpdate();
+		pstmtAppend.setString(1, account);
+		pstmtAppend.setString(2, passwd);
+		pstmtAppend.setString(3, realname);
+		int rowCount = pstmtAppend.executeUpdate();
 		
 		return rowCount != 0;
 	}
